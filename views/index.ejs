@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <title>Document</title>
+</head>
+<body>
+<div class="container">
+    <h1>URL Shortner</h1>
+    <form action="/shortUrls" method="POST" class="my-4 form-inline">
+        <label for="fullUrl" class="sr-only">Url</label>
+        <input required placeholder="Url" type="url" name="fullUrl" id="fullUrl" class="form-control col mr-2">
+        <button class="btn btn-success" type="submit">Shorten</button>
+    </form>
+
+    <table class="table table-striped table-responsive">
+        <thead>
+        <tr>
+            <th>Full URL</th>
+            <th>Short URL</th>
+            <th>Visit Count</th>
+            <th>Visit Count Prev Hr</th>
+            <th>Creation Time</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% urls.forEach(url => { %>
+            <tr>
+                <td><a href="<%= url.fullUrl %>"><%= url.fullUrl %></a></td>
+                <td><a href="<%= url.shortUrl %>"><%= url.shortUrl %></a></td>
+                <td><%= url.noOfVisits %></td>
+                <td><%= url.prevCount %></td>
+                <td><%= url.createdAt %></td>
+            </tr>
+        <% }) %>
+        </tbody>
+    </table>
+
+    <div class="container mt-5">
+        <canvas id="myChart"></canvas>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+<script>
+    let chartDatas =  <%- JSON.stringify(chartData) %>
+
+    var labels = chartDatas.map(e => moment(e.x, "HH:mm"));
+    var data = chartDatas.map(e => e.y);
+
+    var ctx = document.getElementById("myChart").getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Visit per Hour',
+                data: data,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    time: {
+                        unit: 'hour',
+                        displayFormats: {
+                            hour: 'HH'
+                        }
+                    }
+                }]
+            },
+        }
+    });
+
+</script>
+</body>
+</html>
